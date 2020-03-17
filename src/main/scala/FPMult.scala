@@ -1,12 +1,14 @@
 package ChiselFloat
 
-import Chisel._
+import chisel3._
+import chisel3.util._
+import chisel3.iotesters._
 import FloatUtils.{floatToBigInt, doubleToBigInt}
 
 class MantissaRounder(val n: Int) extends Module {
     val io = new Bundle {
-        val in = UInt(INPUT, n)
-        val out = UInt(OUTPUT, n - 1)
+        val in = Input(UInt(n.W))
+        val out = Output(UInt((n - 1).W))
     }
 
     io.out := io.in(n - 1, 1) + io.in(0)
@@ -14,9 +16,9 @@ class MantissaRounder(val n: Int) extends Module {
 
 class FPMult(val n: Int) extends Module {
     val io = new Bundle {
-        val a = Bits(INPUT, n)
-        val b = Bits(INPUT, n)
-        val res = Bits(OUTPUT, n)
+        val a   = Input(Bits(n.W))
+        val b   = Input(Bits(n.W))
+        val res = Output(Bits(n.W))
     }
 
     val a_wrap = new FloatWrapper(io.a)
@@ -27,14 +29,14 @@ class FPMult(val n: Int) extends Module {
     val stage1_mantissa = a_wrap.mantissa * b_wrap.mantissa
     val stage1_zero = a_wrap.zero || b_wrap.zero
 
-    val sign_reg = Reg(next = stage1_sign)
-    val exponent_reg = Reg(next = stage1_exponent)
-    val mantissa_reg = Reg(next = stage1_mantissa)
-    val zero_reg = Reg(next = stage1_zero)
+    val sign_reg = RegNext(stage1_sign)
+    val exponent_reg = RegNext(stage1_exponent)
+    val mantissa_reg = RegNext(stage1_mantissa)
+    val zero_reg = RegNext(stage1_zero)
 
     val stage2_sign = sign_reg
-    val stage2_exponent = UInt(width = a_wrap.exponent.getWidth)
-    val stage2_mantissa = UInt(width = a_wrap.mantissa.getWidth - 1)
+    val stage2_exponent = UInt(a_wrap.exponent.getWidth)
+    val stage2_mantissa = UInt(a_wrap.mantissa.getWidth - 1)
 
     val (mantissaLead, mantissaSize, exponentSize, exponentSub) = n match {
         case 32 => (47, 23, 8, 127)
@@ -58,15 +60,15 @@ class FPMult(val n: Int) extends Module {
 
     stage2_mantissa := rounder.io.out
 
-    io.res := Cat(stage2_sign.toBits(),
-                  stage2_exponent.toBits(),
-                  stage2_mantissa.toBits())
+    io.res := Cat(stage2_sign.toBits,
+                  stage2_exponent.toBits,
+                  stage2_mantissa.toBits)
 }
 
 class FPMult32 extends FPMult(32) {}
 class FPMult64 extends FPMult(64) {}
 
-class FPMult32Test(c: FPMult32) extends Tester(c) {
+class FPMult32Test(c: FPMult32) extends PeekPokeTester(c) {
     var lastExpected = 0.0f
 
     poke(c.io.a, floatToBigInt(0.0f))
@@ -93,7 +95,7 @@ class FPMult32Test(c: FPMult32) extends Tester(c) {
     expect(c.io.res, floatToBigInt(lastExpected))
 }
 
-class FPMult64Test(c: FPMult64) extends Tester(c) {
+class FPMult64Test(c: FPMult64) extends PeekPokeTester(c) {
     var lastExpected = 0.0
 
     for (i <- 0 until 8) {

@@ -1,6 +1,8 @@
 package ChiselFloat
 
-import Chisel._
+import chisel3._
+import chisel3.util._
+import chisel3.iotesters._
 
 object TesterMain {
     def main(args: Array[String]) {
@@ -15,13 +17,15 @@ object TesterMain {
                     c => new FPMult64Test(c)
                 }
             case "FPAdd32" =>
-                chiselMainTest(testArgs, () => Module(new FPAdd32())) {
-                    c => new FPAdd32Test(c)
-                }
+                chisel3.Driver.execute(args, () => new FPAdd32())
+                // chiselMainTest(testArgs, () => Module(new FPAdd32())) {
+                //     c => new FPAdd32Test(c)
+                // }
             case "FPAdd64" =>
-                chiselMainTest(testArgs, () => Module(new FPAdd64())) {
-                    c => new FPAdd64Test(c)
-                }
+                chisel3.Driver.execute(args, () => new FPAdd64())
+                // chiselMainTest(testArgs, () => Module(new FPAdd64())) {
+                //     c => new FPAdd64Test(c)
+                // }
         }
     }
 }
