@@ -77,6 +77,7 @@ class FPMult32Test(c: FPMult32) extends Tester(c) {
         val a = rnd.nextFloat() * 10000.0f - 5000.0f
         val b = rnd.nextFloat() * 10000.0f - 5000.0f
         val expected = a * b
+        expect(c.io.res, floatToBigInt(lastExpected))
 
         poke(c.io.a, floatToBigInt(a))
         poke(c.io.b, floatToBigInt(b))
@@ -84,7 +85,7 @@ class FPMult32Test(c: FPMult32) extends Tester(c) {
 
         println(s"Expecting $lastExpected or ${floatToBigInt(lastExpected)}")
 
-        expect(c.io.res, floatToBigInt(lastExpected))
+        // expect(c.io.res, floatToBigInt(lastExpected))
         lastExpected = expected
     }
 
@@ -103,11 +104,11 @@ class FPMult64Test(c: FPMult64) extends Tester(c) {
 
         poke(c.io.a, doubleToBigInt(a))
         poke(c.io.b, doubleToBigInt(b))
-        step(1)
 
         if (i > 0) {
             expect(c.io.res, doubleToBigInt(lastExpected))
         }
+        step(1)
         lastExpected = expected
     }
 
