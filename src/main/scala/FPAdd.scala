@@ -248,7 +248,8 @@ class FPAdd64 extends FPAdd(64) {}
 class FPAdd32Test(c: FPAdd32) extends Tester(c) {
     val inputsQueue = Queue((0.0f, 0.0f))
     val usedInputsQueue = Queue[(Float, Float)]()
-    val expectedQueue = Queue(None, None, None, Some(0.0f))
+    // val expectedQueue = Queue(None, None, None, Some(0.0f))
+    val expectedQueue = Queue(None, None, Some(0.0f))
 
     def randFloat(): Float = {
         rnd.nextFloat() * 10000.0f - 5000.0f

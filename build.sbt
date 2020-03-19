@@ -4,8 +4,9 @@ version := "0.1-SNAPSHOT"
 
 name := "chisel-float"
 
-scalaVersion := "2.10.3"
+// scalaVersion := "2.10.3"
+scalaVersion := "2.11.12"
 
-addSbtPlugin("com.github.scct" % "sbt-scct" % "0.2")
+// addSbtPlugin("com.github.scct" % "sbt-scct" % "0.2")
 
-libraryDependencies += "edu.berkeley.cs" %% "chisel" % "2.3-SNAPSHOT"
+libraryDependencies += "edu.berkeley.cs" %% "chisel" % "latest.release"
